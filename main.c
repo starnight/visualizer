@@ -201,6 +201,22 @@ void serial_readwrite_task(void *pvParameters)
 	}
 }
 
+void foo_task(void *pvParameters)
+{
+	while(1) {
+		queue_str_task("This is foo task.\n\r", 5);
+		vTaskDelay(50);
+	}
+}
+
+void bar_task(void *pvParameters)
+{
+	while(1) {
+		queue_str_task("This is bar task.\n\r", 5);
+		vTaskDelay(50);
+	}
+}
+
 int main()
 {
 	logfile = open("log", 4);
@@ -247,6 +263,18 @@ int main()
 	            (signed portCHAR *) "Serial Read/Write",
 	            512 /* stack size */, NULL,
 	            tskIDLE_PRIORITY + 10, NULL);
+
+	/* Create a foo task and run continually with writing periodically. */
+	xTaskCreate(foo_task,
+				(signed portCHAR *) "Foo Task",
+				512 /* stack size */, NULL,
+				tskIDLE_PRIORITY + 11, NULL);
+
+	/* Create a foo task and run continually with writing periodically. */
+	xTaskCreate(bar_task,
+				(signed portCHAR *) "Bar Task",
+				512 /* stack size */, NULL,
+				tskIDLE_PRIORITY + 11, NULL);
 
 	/* Start running the tasks. */
 	vTaskStartScheduler();
